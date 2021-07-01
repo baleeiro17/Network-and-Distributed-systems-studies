@@ -31,7 +31,7 @@ func TcpClient(connection string, message string) {
 		fmt.Printf("Reading %d bytes in tcp client\n", n)
 		fmt.Printf("message received in tcp client is %s\n", buffer[:n])
 
-		// fecha a conexão
+		// close connection
 		conn.Close()
 
 		return

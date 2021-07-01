@@ -4,6 +4,7 @@ import (
 	"Network-and-System-Distributed-studies/tcp"
 	"fmt"
 	"os"
+	"time"
 )
 
 func main() {
@@ -19,7 +20,9 @@ func main() {
 	// server TCP.
 	go tcp.TcpServer(args[1])
 
+	time.Sleep(5 * time.Second)
+
 	// client TCP that connects to server.
-	go tcp.TcpClient(args[1], "SD é muito interessante!")
+	tcp.TcpClient(args[1], "SD é muito interessante!")
 
 }
