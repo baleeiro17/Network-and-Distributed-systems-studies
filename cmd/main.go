@@ -1,8 +1,8 @@
 package main
 
 import (
-	client "Network-and-System-Distributed-studies/rpc/rpc-client"
-	server "Network-and-System-Distributed-studies/rpc/rpc-server"
+	client "Network-and-Distributed-systems-studies/rpc/rpc-client"
+	server "Network-and-Distributed-systems-studies/rpc/rpc-server"
 )
 
 func main() {

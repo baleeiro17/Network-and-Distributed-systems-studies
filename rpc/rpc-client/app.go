@@ -1,7 +1,7 @@
 package rpc_client
 
 import (
-	data "Network-and-System-Distributed-studies/rpc/rpc-server"
+	data "Network-and-Distributed-systems-studies/rpc/rpc-server"
 	"fmt"
 	"net/rpc"
 )
