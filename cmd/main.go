@@ -11,7 +11,7 @@ import (
 func main() {
 
 	args := os.Args
-	if len(args) <= 2 {
+	if len(args) <= 2 && args[1] == "client" {
 		fmt.Println("Please provide enough arguments.")
 		return
 	}
@@ -20,15 +20,15 @@ func main() {
 	server.RpcServer(":8081")
 
 	// client rpc server
-	fmt.Printf("N1:%s\n", args[1])
-	fmt.Printf("N2:%s\n", args[2])
+	fmt.Printf("N1:%s\n", args[2])
+	fmt.Printf("N2:%s\n", args[3])
 
-	n1, err := strconv.Atoi(args[1])
+	n1, err := strconv.Atoi(args[2])
 	if err != nil {
 		return
 	}
 
-	n2, err := strconv.Atoi(args[2])
+	n2, err := strconv.Atoi(args[3])
 	if err != nil {
 		return
 	}
