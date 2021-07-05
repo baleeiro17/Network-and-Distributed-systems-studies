@@ -16,6 +16,10 @@ func main() {
 		return
 	}
 
+	// running rpc server
+	server.RpcServer(":8081")
+
+	// client rpc server
 	fmt.Printf("N1:%s\n", args[1])
 	fmt.Printf("N2:%s\n", args[2])
 
@@ -28,9 +32,6 @@ func main() {
 	if err != nil {
 		return
 	}
-
-	// running rpc server
-	server.RpcServer(":8081")
 
 	// time.Sleep(5 * time.Second)
 
