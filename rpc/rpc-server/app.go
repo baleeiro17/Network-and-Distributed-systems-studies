@@ -22,7 +22,6 @@ func RpcServer(address string) {
 
 	for {
 		rpc.Accept(l)
-		fmt.Println("accept connection with RPC server")
 	}
 
 }

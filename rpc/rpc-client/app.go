@@ -23,24 +23,24 @@ func RpcClient(address string, n1 int, n2 int) {
 	if err := client.Call("Handler.Sum", args, &resu); err != nil {
 		fmt.Printf("Error: in Handler.Sum %+v", err)
 	} else {
-		fmt.Printf("resu of sum is %d\n", *resu)
+		fmt.Printf("result of sum is %d\n", *resu)
 	}
 
 	if err := client.Call("Handler.Subtraction", args, &resu); err != nil {
 		fmt.Printf("Error: in Handler.Sum %+v", err)
 	} else {
-		fmt.Printf("resu of subtraction is %d\n", *resu)
+		fmt.Printf("result of subtraction is %d\n", *resu)
 	}
 
 	if err := client.Call("Handler.Division", args, &resu); err != nil {
 		fmt.Printf("Error: in Handler.Sum %+v", err)
 	} else {
-		fmt.Printf("resu of division is %d\n", *resu)
+		fmt.Printf("result of division is %d\n", *resu)
 	}
 
 	if err := client.Call("Handler.Product", args, &resu); err != nil {
 		fmt.Printf("Error: in Handler.Sum %+v", err)
 	} else {
-		fmt.Printf("resu of product is %d\n", *resu)
+		fmt.Printf("result of product is %d\n", *resu)
 	}
 }
