@@ -1,40 +1,17 @@
 package main
 
 import (
-	client "Network-and-Distributed-systems-studies/rpc/rpc-client"
-	server "Network-and-Distributed-systems-studies/rpc/rpc-server"
-	"fmt"
-	"os"
-	"strconv"
+	client "Network-and-Distributed-systems-studies/chat-rpc/chat-client"
+	server "Network-and-Distributed-systems-studies/chat-rpc/chat-server"
+	"time"
 )
 
 func main() {
 
-	args := os.Args
-	if len(args) <= 2 && args[1] == "client" {
-		fmt.Println("Please provide enough arguments.")
-		return
-	}
-
 	// running rpc server
-	server.RpcServer(":8081")
+	go server.ChatServer(":8081")
 
-	// client rpc server
-	fmt.Printf("N1:%s\n", args[2])
-	fmt.Printf("N2:%s\n", args[3])
+	time.Sleep(5 * time.Second)
 
-	n1, err := strconv.Atoi(args[2])
-	if err != nil {
-		return
-	}
-
-	n2, err := strconv.Atoi(args[3])
-	if err != nil {
-		return
-	}
-
-	// time.Sleep(5 * time.Second)
-
-	// running rpc client
-	client.RpcClient("127.0.0.1:8081", n1, n2)
+	client.ChatClient("127.0.0.1:8081")
 }
