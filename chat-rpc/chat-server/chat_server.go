@@ -37,7 +37,7 @@ func (c *Chat) AddUser(name string, reply *string) error {
 	c.users.Store(name, user)
 
 	// insere a mensagem no banco de dados do chat.
-	msg := fmt.Sprintf("%s: %s", name, "Olá a todos, cheguei!!!")
+	msg := fmt.Sprintf("%s: %s\n", name, "Olá a todos, cheguei!!!")
 	c.messages.Store(c.idMsg, msg)
 
 	// incrementa o identificador da mensagem.
@@ -57,7 +57,7 @@ func (c *Chat) SendMessage(client User, reply *string) error {
 	}
 
 	// atualiza os bancos de todos os usuários com a mensagem.
-	msg := fmt.Sprintf("%s: %s", user.(*User).Name, user.(*User).Message)
+	msg := client.Message
 
 	// insere a mensagem no banco de dados do chat.
 	c.messages.Store(c.idMsg, msg)
@@ -119,7 +119,6 @@ func (c *Chat) ShowMessages(client string, reply *string) error {
 			msg, ok := c.messages.Load(i)
 			if ok {
 				*reply = fmt.Sprintf("%s\n%s", *reply, msg)
-				// fmt.Println(msg)
 			}
 		}
 

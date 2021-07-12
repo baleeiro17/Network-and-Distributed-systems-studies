@@ -30,8 +30,13 @@ func ChatClient(address string, name string) {
 		fmt.Printf("Error: in Chat.AddUser %+v", err)
 	}
 
+	fmt.Println("Bem vindo ao chat", name, "!")
+	fmt.Println("----------------------------------------------------------------")
+
 	// função que lida com a input para o servidor.
 	go checkData(name, client)
+
+	time.Sleep(2 * time.Second)
 
 	go senDataToserver(name, client)
 
@@ -44,13 +49,13 @@ func senDataToserver(name string, conn *rpc.Client) {
 	var resu *string
 
 	data := &data.User{}
-	fmt.Println("Digite algo no chat: ")
-	fmt.Println("-----------------------------------------------------------")
+
 	for {
 
 		// lendo o teclado
 		reader := bufio.NewReader(os.Stdin)
 		chat, _ := reader.ReadString('\n')
+		fmt.Print(fmt.Sprintf("%s: %s", name, chat))
 
 		// coloca a informação na estrutura de dados aceita pelo servidor
 		data.Name = name
@@ -81,7 +86,8 @@ func checkData(name string, conn *rpc.Client) {
 				fmt.Printf("Error: in Chat.ShowMessages %+v\n", err)
 				break
 			} else {
-				fmt.Println(*resu2)
+				fmt.Print(*resu2)
+				fmt.Println("-----------------------------------------------------")
 			}
 
 		}
