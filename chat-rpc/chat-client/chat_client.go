@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/rpc"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -16,6 +17,8 @@ type User struct {
 }
 
 func ChatClient(address string, name string) {
+
+	wg := sync.WaitGroup{}
 
 	// conecta ao servidor via tcp.
 	client, err := rpc.Dial("tcp", address)
@@ -33,15 +36,15 @@ func ChatClient(address string, name string) {
 	fmt.Println("Bem vindo ao chat", name, "!")
 	fmt.Println("----------------------------------------------------------------")
 
-	// função que lida com a input para o servidor.
+	// checa no servidor se chegou alguma mensagem.
 	go checkData(name, client)
+	wg.Add(1)
 
-	time.Sleep(2 * time.Second)
-
+	// função que lida com a input para o servidor.
 	go senDataToserver(name, client)
+	wg.Add(1)
 
-	time.Sleep(200000 * time.Second)
-
+	wg.Wait()
 }
 
 func senDataToserver(name string, conn *rpc.Client) {
