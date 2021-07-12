@@ -54,7 +54,7 @@ func senDataToserver(name string, conn *rpc.Client) {
 
 		// coloca a informação na estrutura de dados aceita pelo servidor
 		data.Name = name
-		data.Message = fmt.Sprintf("%s:%s", "lucas", chat)
+		data.Message = fmt.Sprintf("%s:%s", name, chat)
 
 		// envia mensagem para servidor
 		if err := conn.Call("Chat.SendMessage", data, &resu); err != nil {
@@ -77,7 +77,7 @@ func checkData(name string, conn *rpc.Client) {
 
 		if *resu {
 
-			if err := conn.Call("Chat.ShowMessages", "lucas", &resu2); err != nil {
+			if err := conn.Call("Chat.ShowMessages", name, &resu2); err != nil {
 				fmt.Printf("Error: in Chat.ShowMessages %+v\n", err)
 				break
 			} else {

@@ -12,6 +12,6 @@ func main() {
 
 	// time.Sleep(5 * time.Second)
 
-	client.ChatClient(":8081", "gabriel")
+	client.ChatClient("127.0.0.1:8081", "marcos")
 
 }
