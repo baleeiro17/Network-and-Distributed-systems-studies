@@ -2,18 +2,22 @@ package chat_client
 
 import (
 	data "Network-and-Distributed-systems-studies/chat-rpc/chat-server"
+	"bufio"
 	"fmt"
 	"net/rpc"
+	"os"
+	"time"
 )
 
-type Client struct {
-	name    string
-	message string
+type User struct {
+	Name     string
+	Message  string
+	MsgLidas int
 }
 
-func ChatClient(address string) {
+func ChatClient(address string, name string) {
 
-	// connect to server.
+	// conecta ao servidor via tcp.
 	client, err := rpc.Dial("tcp", address)
 	if err != nil {
 		panic(err)
@@ -21,32 +25,68 @@ func ChatClient(address string) {
 
 	var resu *string
 
-	args := &data.Client{
-		Name:    "lucas",
-		Message: "Tudo bem?",
-	}
-
-	if err := client.Call("Chat.AddUser", "lucas", &resu); err != nil {
+	// cria o usuário.
+	if err := client.Call("Chat.AddUser", name, &resu); err != nil {
 		fmt.Printf("Error: in Chat.AddUser %+v", err)
-	} else {
-		fmt.Printf("result of AddUser is %s\n", *resu)
 	}
 
-	if err := client.Call("Chat.AddUser", "Gabriel", &resu); err != nil {
-		fmt.Printf("Error: in Chat.AddUser %+v", err)
-	} else {
-		fmt.Printf("result of AddUser is %s\n", *resu)
+	// função que lida com a input para o servidor.
+	go checkData(name, client)
+
+	go senDataToserver(name, client)
+
+	time.Sleep(200000 * time.Second)
+
+}
+
+func senDataToserver(name string, conn *rpc.Client) {
+
+	var resu *string
+
+	data := &data.User{}
+	fmt.Println("Digite algo no chat: ")
+	fmt.Println("-----------------------------------------------------------")
+	for {
+
+		// lendo o teclado
+		reader := bufio.NewReader(os.Stdin)
+		chat, _ := reader.ReadString('\n')
+
+		// coloca a informação na estrutura de dados aceita pelo servidor
+		data.Name = name
+		data.Message = fmt.Sprintf("%s:%s", "lucas", chat)
+
+		// envia mensagem para servidor
+		if err := conn.Call("Chat.SendMessage", data, &resu); err != nil {
+			fmt.Printf("Error: in Chat.SendMessage %+v", err)
+			break
+		}
+	}
+}
+
+func checkData(name string, conn *rpc.Client) {
+	var resu *bool
+	var resu2 *string
+
+	for {
+
+		if err := conn.Call("Chat.NotifyUser", name, &resu); err != nil {
+			fmt.Printf("Error: in Chat.NotifyUser %+v\n", err)
+			break
+		}
+
+		if *resu {
+
+			if err := conn.Call("Chat.ShowMessages", "lucas", &resu2); err != nil {
+				fmt.Printf("Error: in Chat.ShowMessages %+v\n", err)
+				break
+			} else {
+				fmt.Println(*resu2)
+			}
+
+		}
+
+		time.Sleep(1 * time.Second)
 	}
 
-	if err := client.Call("Chat.SendMessage", args, &resu); err != nil {
-		fmt.Printf("Error: in Chat.SendMessage %+v", err)
-	} else {
-		fmt.Printf("result of SendMessage is %s\n", *resu)
-	}
-
-	if err := client.Call("Chat.ShowMessages", "Gabriel", &resu); err != nil {
-		fmt.Printf("Error: in Chat.ShowMessages %+v\n", err)
-	} else {
-		fmt.Printf("result of ShowMessages is %s\n", *resu)
-	}
 }

@@ -7,27 +7,22 @@ import (
 	"sync"
 )
 
-type Client struct {
-	Name    string
-	Message string
-}
-
 type User struct {
-	name     string
-	idMsg    int
-	messages sync.Map // map[int]*String idMsg as Key
+	Name     string
+	Message  string
+	MsgLidas int
 }
 
 type Chat struct {
-	name     [30]string
-	idUsr    int
-	database sync.Map // map[name]*User, name as key
+	idMsg    int
+	users    sync.Map // map[name]*User, name como key
+	messages sync.Map // map[int]*String, idMsg como Key
 }
 
 // chat allocation.
 func new() *Chat {
 	h := &Chat{}
-	h.idUsr = 0
+	h.idMsg = 0
 	return h
 }
 
@@ -35,64 +30,104 @@ func (c *Chat) AddUser(name string, reply *string) error {
 
 	// cria o usuário e cadastra no chat.
 	user := &User{}
-	user.name = name
-	user.idMsg = 0
+	user.Name = name
+	user.MsgLidas = 0
 
 	// grava o usuário na gerência do chat.
-	// e também os nomes que são usados como chave.
-	c.database.Store(name, user)
-	c.name[c.idUsr] = name
-	c.idUsr++
+	c.users.Store(name, user)
 
-	// atualiza os bancos de todos os usuários com a mensagem de boa vindas do usuário.
+	// insere a mensagem no banco de dados do chat.
 	msg := fmt.Sprintf("%s: %s", name, "Olá a todos, cheguei!!!")
-	for i := 0; i < c.idUsr; i++ {
-		user, ok := c.database.Load(c.name[i])
-		if ok {
-			idMsg := user.(*User).idMsg
-			user.(*User).messages.Store(idMsg, msg)
-			user.(*User).idMsg++
-		}
-	}
+	c.messages.Store(c.idMsg, msg)
 
-	*reply = name
+	// incrementa o identificador da mensagem.
+	c.idMsg++
+
+	*reply = "usuário cadastrado com sucesso!"
 
 	return nil
 }
 
-func (c *Chat) SendMessage(message Client, reply *string) error {
+func (c *Chat) SendMessage(client User, reply *string) error {
 
-	// atualiza os bancos de todos os usuários com a mensagem.
-	msg := fmt.Sprintf("%s: %s", message.Name, message.Message)
-
-	// primeiro checar todos os clientes que existem.
-	for i := 0; i < c.idUsr; i++ {
-		user, ok := c.database.Load(c.name[i])
-		if ok {
-			idMsg := user.(*User).idMsg
-			user.(*User).messages.Store(idMsg, msg)
-			user.(*User).idMsg++
-		}
+	// verifica o usuário.
+	user, ok := c.users.Load(client.Name)
+	if !ok {
+		*reply = "usuário não existe"
 	}
 
-	result := "user found"
+	// atualiza os bancos de todos os usuários com a mensagem.
+	msg := fmt.Sprintf("%s: %s", user.(*User).Name, user.(*User).Message)
+
+	// insere a mensagem no banco de dados do chat.
+	c.messages.Store(c.idMsg, msg)
+
+	// incrementa o identificador da mensagem do chat.
+	c.idMsg++
+
+	//incrementa a quantidade de mensagens lidas do usuário que envia.
+	user.(*User).MsgLidas++
+
+	result := "mensagem enviada com sucesso!"
 	*reply = result
+
+	return nil
+}
+
+func (c *Chat) ShowReadMessages(client string, reply *int) error {
+
+	// verifica o usuário.
+	user, ok := c.users.Load(client)
+	if !ok {
+		*reply = 0
+	}
+
+	*reply = user.(*User).MsgLidas
+
+	return nil
+}
+
+func (c *Chat) NotifyUser(client string, reply *bool) error {
+
+	// verifica o usuário.
+	user, ok := c.users.Load(client)
+	if !ok {
+		return fmt.Errorf("invalid user")
+	}
+
+	// retorna para o cliente um true se uma nova mensagem foi enviada.
+	if user.(*User).MsgLidas != c.idMsg {
+		*reply = true
+	} else {
+		*reply = false
+	}
 
 	return nil
 }
 
 func (c *Chat) ShowMessages(client string, reply *string) error {
 
-	user, ok := c.database.Load(client)
-	if ok {
-		for x := 0; x < user.(*User).idMsg; x++ {
-			message, find := user.(*User).messages.Load(x)
-			if find {
-				fmt.Println(fmt.Sprintf("%s", message))
+	// verifica o usuário.
+	user, ok := c.users.Load(client)
+	if !ok {
+		*reply = "usuário não existe"
+	}
+
+	if user.(*User).MsgLidas != c.idMsg {
+		*reply = ""
+		for i := user.(*User).MsgLidas; i < c.idMsg; i++ {
+			msg, ok := c.messages.Load(i)
+			if ok {
+				*reply = fmt.Sprintf("%s\n%s", *reply, msg)
+				// fmt.Println(msg)
 			}
 		}
+
+		// atualiza as mgs lidas.
+		user.(*User).MsgLidas = c.idMsg
+
 	} else {
-		*reply = "user not found"
+		*reply = ""
 	}
 
 	return nil
