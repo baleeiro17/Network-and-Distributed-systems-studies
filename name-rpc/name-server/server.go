@@ -25,7 +25,7 @@ func new() *Directory {
 	return d
 }
 
-func (d *Directory) AddService(service Service, reply *int) error {
+func (d *Directory) AddService(service *Service, reply *int) error {
 
 	fmt.Println("Added service to server:")
 	fmt.Println("Service Name:", service.Name)
@@ -59,7 +59,9 @@ func (d *Directory) GetService(service string, reply *Service) error {
 	}
 
 	// return the service
-	reply = app.(*Service)
+	reply.Name = app.(*Service).Name
+	reply.Ip = app.(*Service).Ip
+	reply.Port = app.(*Service).Port
 
 	return nil
 }
