@@ -1,5 +1,11 @@
 package rpc_server
 
+import (
+	"fmt"
+	"net"
+	"net/rpc"
+)
+
 // data structures used in RPC server.
 type Valor struct {
 	N1 int
@@ -58,4 +64,24 @@ func (*Handler) Product(values Valor, reply *int) error {
 	*reply = resul
 
 	return nil
+}
+
+func RpcServer(address string) {
+
+	// initialize handler and register in calculator-rpc server.
+	handler := new()
+	rpc.Register(handler)
+
+	// start calculator-rpc server
+	l, err := net.Listen("tcp", address)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("RPC Calculator-Server is running")
+
+	for {
+		rpc.Accept(l)
+	}
+
 }

@@ -134,11 +134,11 @@ func (c *Chat) ShowMessages(client string, reply *string) error {
 
 func ChatServer(address string) {
 
-	// initialize handler and register in rpc server.
+	// initialize handler and register in calculator-rpc server.
 	chat := new()
 	rpc.Register(chat)
 
-	// start rpc server
+	// start calculator-rpc server
 	l, err := net.Listen("tcp", address)
 	if err != nil {
 		panic(err)
