@@ -13,8 +13,8 @@ import (
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 type Result struct {
-	text string
-	key  string
+	Text string
+	Key  string
 }
 
 type Crypto struct {
@@ -28,7 +28,7 @@ func new() *Crypto {
 func (c *Crypto) EncryptString(text string, reply *Result) error {
 
 	// generate key
-	key := RandStringBytes(22)
+	key := RandStringBytes(16)
 
 	// convert text to bytes
 	plainText := []byte(text)
@@ -39,7 +39,7 @@ func (c *Crypto) EncryptString(text string, reply *Result) error {
 		panic(err.Error())
 	}
 
-	nonce := []byte("DistributedSystems")
+	nonce := []byte("blogPostGeek")
 
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
@@ -48,18 +48,17 @@ func (c *Crypto) EncryptString(text string, reply *Result) error {
 
 	ciphertext := aesgcm.Seal(nil, nonce, plainText, nil)
 
-	reply = &Result{}
-	reply.text = fmt.Sprintf("%x", ciphertext)
-	reply.key = key
+	reply.Text = fmt.Sprintf("%x", ciphertext)
+	reply.Key = key
 
 	return nil
 }
 
 func (c *Crypto) DecryptString(info *Result, reply *string) error {
 
-	key := info.key
-	nonce := []byte("DistributedSystems")
-	ciphertext, err := hex.DecodeString(info.text)
+	key := info.Key
+	nonce := []byte("blogPostGeek")
+	ciphertext, err := hex.DecodeString(info.Text)
 	if err != nil {
 		panic(err.Error())
 	}

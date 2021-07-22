@@ -10,9 +10,9 @@ import (
 )
 
 type Service struct {
-	Name string
-	Ip   string
-	Port string
+	Name  string
+	Ip    string
+	token int
 }
 
 type Directory struct {
@@ -30,7 +30,6 @@ func (d *Directory) AddService(service *Service, reply *int) error {
 	fmt.Println("Added service to server:")
 	fmt.Println("Service Name:", service.Name)
 	fmt.Println("Service IP:", service.Ip)
-	fmt.Println("Service Port:", service.Port)
 
 	// persist the service
 	d.services.Store(service.Name, service)
@@ -48,6 +47,36 @@ func (d *Directory) AddService(service *Service, reply *int) error {
 	return nil
 }
 
+func (d *Directory) UpdatedService(service *Service, reply *string) error {
+
+	fmt.Println("Updated service to server:")
+	fmt.Println("Service Name:", service.Name)
+	fmt.Println("Service IP:", service.Ip)
+
+	// persist the service
+	app, ok := d.services.Load(service.Name)
+	if !ok {
+		fmt.Println("Service was not found")
+		reply = nil
+	}
+
+	// check the token
+	tk, ok := d.authentication.Load(service.Name)
+	if !ok {
+		fmt.Println("Service was not found")
+		reply = nil
+	}
+
+	if tk == service.token {
+		app.(*Service).Name = service.Name
+		app.(*Service).Ip = service.Ip
+	}
+
+	*reply = "service updated was sucessful"
+
+	return nil
+}
+
 func (d *Directory) GetService(service string, reply *Service) error {
 
 	// get the service information
@@ -61,7 +90,30 @@ func (d *Directory) GetService(service string, reply *Service) error {
 	// return the service
 	reply.Name = app.(*Service).Name
 	reply.Ip = app.(*Service).Ip
-	reply.Port = app.(*Service).Port
+
+	return nil
+}
+
+func (d *Directory) DeletedService(service *Service, reply *string) error {
+
+	fmt.Println("Deleted service to server:")
+	fmt.Println("Service Name:", service.Name)
+	fmt.Println("Service IP:", service.Ip)
+
+	// check the token
+	tk, ok := d.authentication.Load(service.Name)
+	if !ok {
+		fmt.Println("Service was not found")
+		reply = nil
+	}
+
+	if tk == service.token {
+
+		// delete the service
+		d.services.Delete(service.Name)
+	}
+
+	*reply = "service deleted"
 
 	return nil
 }
